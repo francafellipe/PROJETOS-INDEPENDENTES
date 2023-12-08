@@ -1,0 +1,96 @@
+from mysql import connector
+class Personagem :
+    def __init__(self,nome,habilidade):
+        self.nome = nome
+        self.habilidade = habilidade
+        
+
+    def Lutar ():
+        
+        pass
+
+class Heroi (Personagem):
+    def __init__(self, nome, habilidade):
+        super().__init__( nome, habilidade)
+        self.nivel = 10
+        self.vida = 200
+        self.poder = 0
+    
+
+class Vilao (Personagem):
+    def __init__(self, nome, habilidade):
+        super().__init__(nome, habilidade)
+        self.nivel = 5
+        self.vida = 100
+        self.poder = 0
+def jogo ():
+    jogar = int(input(" 1 - Criar novo personagem \n"
+                      " 2 - iniciar batalha \n "
+                      " 3 - Ver informações dos personagens "))
+    if jogar == 1:
+        print("Bem vindo a criação de personagem .")
+        hero_inimigo = int(input("1 - PARA CRIAR HEROI \n"
+                                 "2 - PARA CRIAR VILÃO "))
+        if hero_inimigo == 1:
+            tabela_heroi = "CREATE TABLE if not exists heroi (id_personagem int primary key auto_increment , nome varchar (255), habilidade varchar (255), classe varchar(255), nivel int, ponto_vida int)"
+            cursor.execute(tabela_heroi)
+            nome = input("Qual nome do Heroi : ")
+            habilidade = input("Defina 1 habilidade :")
+            nivel = Heroi(self.nivel)
+            ponto_vida =Heroi(self.vida)
+            cursor.execute("INSERT INTO heroi (nome,habilidade,classe,nivel,ponto_vida) VALUES ('%s','%s','%s','%s','%s')",nome,habilidade,classe,nivel,ponto_vida)
+            conexao.commit()
+
+        elif hero_inimigo == 2 :
+            tabela_vilao = "CREATE TABLE if not exists vilao (id_personagem int primary key auto_increment , nome varchar (255), habilidade varchar (255), classe varchar(255), nivel int, ponto_vida int)"
+            cursor.execute(tabela_vilao)
+            nome = input("Qual nome do Vilao : ")
+            habilidade = input("Defina 1 habilidade :")
+            classe = input('Defina a classe')
+            nivel = Vilao(self.nivel)
+            ponto_vida =Vilao(self.vida)
+            cursor.execute("INSERT INTO vilao (nome,habilidade,classe,nivel,ponto_vida) VALUES ('%s','%s','%s','%s','%s')",nome,habilidade,classe,nivel,ponto_vida)
+            conexao.commit()
+    elif jogar==2 :
+        pass
+
+    elif jogar == 3:
+        escolher = int(input("1 para ver herois \n"
+                             "2 para ver lista de vilao"))
+        if escolher == 1:
+            cursor.execute("SELECT * FROM heroi")
+            resultados = cursor.fetchall()
+            print(resultados)
+        elif escolher == 2:
+            cursor.execute("SELECT * FROM vilao")
+            resultados = cursor.fetchall()
+            print(resultados)        
+
+escolha = int(input('1 - Iniciar jogo \n'
+                    '2 - Finalizar jogo \n'))
+while True:
+    if escolha == 1 :
+        conexao = connector.connect(
+        host='localhost',
+        user='root',
+        password='', 
+        )
+        cursor = conexao.cursor()
+        # criar banco de dados
+        banco_dados = "CREATE DATABASE if not exists jogo_rpg"
+        cursor.execute(banco_dados)
+        #criar o use 
+        use = "USE jogo_rpg"
+        cursor.execute(use)
+        jogo()
+
+    elif escolha == 2:
+        cursor.close()
+        break 
+
+    #criar tabela 
+    
+    
+    
+
+    
