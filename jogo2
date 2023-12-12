@@ -1,0 +1,182 @@
+import mysql.connector
+import tkinter as tk
+from tkinter import messagebox
+
+# Conecte ao banco de dados
+conexao = mysql.connector.connect(
+    host="localhost",
+    user="root",
+    password="",
+    database="jogo_rpg"
+)
+
+# Crie a tabela para personagens
+cursor = conexao.cursor()
+cursor.execute("""
+CREATE TABLE IF NOT EXISTS personagens (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nome VARCHAR(255),
+    classe VARCHAR(50),
+    nivel INT,
+    pontos_vida INT
+)
+""")
+conexao.commit()
+
+# Crie a tabela para usuários
+cursor.execute("""
+CREATE TABLE IF NOT EXISTS usuarios (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    username VARCHAR(255),
+    password VARCHAR(255)
+)
+""")
+conexao.commit()
+
+# Feche a conexão
+cursor.close()
+conexao.close()
+
+class Personagem:
+    def __init__(self, nome, classe, nivel, pontos_vida):
+        self.nome = nome
+        self.classe = classe
+        self.nivel = nivel
+        self.pontos_vida = pontos_vida
+
+class Inimigo:
+    def __init__(self, nome, nivel, pontos_vida):
+        self.nome = nome
+        self.nivel = nivel
+        self.pontos_vida = pontos_vida
+
+def criar_personagem(nome, classe):
+    nivel = 1
+    pontos_vida = 100  # Pode ser ajustado conforme necessário
+    return Personagem(nome, classe, nivel, pontos_vida)
+
+def jogo():
+    # Lógica básica do jogo (pode ser expandida)
+    resultado_var.set("Iniciando o jogo...\nCriando personagem...")
+    nome_personagem = input("Digite o nome do seu personagem: ")
+    classe_personagem = input("Escolha a classe do seu personagem: ")
+    personagem = criar_personagem(nome_personagem, classe_personagem)
+    resultado_var.set(f"Personagem criado: {personagem.nome}, Classe: {personagem.classe}, Nível: {personagem.nivel}, Pontos de Vida: {personagem.pontos_vida}")
+    resultado_var.set("Batalha iniciada!")
+    inimigo = Inimigo("Inimigo1", 3, 50)
+    resultado_var.set(f"Você está enfrentando um inimigo: {inimigo.nome}, Nível: {inimigo.nivel}, Pontos de Vida: {inimigo.pontos_vida}")
+    resultado_var.set("Batalha concluída. Você venceu!")
+
+def registrar_usuario():
+    username_value = username.get()
+    password_value = password.get()
+
+    # Conecta ao banco de dados
+    conexao = mysql.connector.connect(
+        host="localhost",
+        user="root",
+        password="",
+        database="jogo_rpg"
+    )
+    cursor = conexao.cursor()
+
+    # Verifica se o usuário já existe
+    cursor.execute("SELECT * FROM usuarios WHERE username = %s", (username_value,))
+    if cursor.fetchone():
+        messagebox.showerror("Erro", "Nome de usuário já existe. Escolha outro.")
+    else:
+        # Insere o novo usuário no banco de dados
+        cursor.execute("INSERT INTO usuarios (username, password) VALUES (%s, %s)", (username_value, password_value))
+        conexao.commit()
+        messagebox.showinfo("Sucesso", "Usuário registrado com sucesso.")
+
+    # Fecha a conexão
+    cursor.close()
+
+def login():
+    def validar_login():
+        username_value = username_verify.get()
+        password_value = password_verify.get()
+
+        # Conecta ao banco de dados
+        conexao = mysql.connector.connect(
+            host="localhost",
+            user="root",
+            password="",
+            database="jogo_rpg"
+        )
+        cursor = conexao.cursor()
+
+        # Verifica se o usuário e senha correspondem a um registro no banco de dados
+        cursor.execute("SELECT * FROM usuarios WHERE username = %s AND password = %s", (username_value, password_value))
+        if cursor.fetchone():
+            messagebox.showinfo("Sucesso", "Login bem-sucedido!")
+            resultado_var.set("Login bem-sucedido! Inicie o jogo.")
+            # Adicione um botão para iniciar o jogo
+            iniciar_jogo_button = tk.Button(root, text="Iniciar Jogo", width=15, height=1, command=jogo)
+            iniciar_jogo_button.pack()
+        else:
+            messagebox.showerror("Erro", "Usuário ou senha incorretos.")
+
+        # Fecha a conexão
+        cursor.close()
+
+    login_screen = tk.Toplevel(root)
+    login_screen.title("Login")
+    login_screen.geometry("300x250")
+
+    username_verify = tk.StringVar()
+    password_verify = tk.StringVar()
+
+    tk.Label(login_screen, text="Digite os detalhes abaixo para fazer login").pack()
+    tk.Label(login_screen, text="").pack()
+
+    username_login_entry = tk.Entry(login_screen, textvariable=username_verify)
+    username_login_entry.pack()
+
+    password_login_entry = tk.Entry(login_screen, textvariable=password_verify, show='*')
+    password_login_entry.pack()
+
+    tk.Button(login_screen, text="Login", width=10, height=1, command=validar_login).pack()
+
+def register():
+    global register_screen, username, password
+
+    register_screen = tk.Toplevel(root)
+    register_screen.title("Registro")
+    register_screen.geometry("300x250")
+
+    username = tk.StringVar()
+    password = tk.StringVar()
+
+    tk.Label(register_screen, text="Digite os detalhes abaixo para se registrar").pack()
+    tk.Label(register_screen, text="").pack()
+
+    username_label = tk.Label(register_screen, text="Nome de usuário * ")
+    username_label.pack()
+    username_entry = tk.Entry(register_screen, textvariable=username)
+    username_entry.pack()
+
+    password_label = tk.Label(register_screen, text="Senha * ")
+    password_label.pack()
+    password_entry = tk.Entry(register_screen, textvariable=password, show='*')
+    password_entry.pack()
+
+    tk.Button(register_screen, text="Registrar", width=10, height=1, command=registrar_usuario).pack()
+
+root = tk.Tk()
+root.geometry("500x500")
+root.title("Jogo RPG")
+
+resultado_var = tk.StringVar()
+resultado_label = tk.Label(root, textvariable=resultado_var, bg="grey", width="50", height="10", font=("Calibri", 11))
+resultado_label.pack()
+tk.Label(root, text="Jogo RPG", bg="grey", width="50", height="2", font=("Calibri", 13)).pack()
+tk.Label(root, text="").pack()
+
+tk.Button(root, text="Login", height="2", width="30", command=login).pack()
+tk.Label(root, text="").pack()
+
+tk.Button(root, text="Registrar", height="2", width="30", command=register).pack()
+
+root.mainloop()
