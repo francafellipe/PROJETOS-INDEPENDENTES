@@ -32,7 +32,7 @@ class Usuario:
     def __init__(self, nome, senha):
         self.nome = nome
         self.senha = senha
-        self.id = None  # Será atribuído após o login
+        self.id = None 
 
     def conectar_banco(self):
         conexao = mysql.connector.connect(
@@ -210,7 +210,7 @@ class JogoRPG:
 
         classes = ['Blade Knight', 'Elfa', 'Magic Gladiador']
         escolha_classe = tk.StringVar(self.janela)
-        escolha_classe.set(classes[0])  # Valor padrão
+        escolha_classe.set(classes[0]) 
 
         dropdown_classe = tk.OptionMenu(self.janela, escolha_classe, *classes)
         dropdown_classe.grid(row=1, column=1)
@@ -276,6 +276,7 @@ class JogoRPG:
 
     def pagina_jogo(self):
         self.limpar_tela()
-        
+      
+
 
 jogo = JogoRPG()
